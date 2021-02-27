@@ -12,7 +12,8 @@ public class Main extends Application {
     private static final int DEFAULT_BOMBS = 50;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
+        Thread.currentThread().setName("Mine Field");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
         Parent root = loader.load();
         Controller controller = loader.getController();

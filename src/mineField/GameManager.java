@@ -1,11 +1,14 @@
 package mineField;
 
+import java.io.File;
+
 // una specie di controller: agisce su Field ma è controllato dal Controller della GUI
 public class GameManager extends Thread {
+    private Field mineField;
+
     private final int width;
     private final int height;
     private final int bombs;
-
     private int flags;
 
     private boolean gameOver = false;
@@ -15,6 +18,7 @@ public class GameManager extends Thread {
         this.height = height;
         this.bombs = bombs;
         flags = bombs;
+        mineField = new Field(width, height, bombs);
     }
 
     @Override
@@ -23,5 +27,9 @@ public class GameManager extends Thread {
         while (!gameOver) {
             
         }
+    }
+
+    public Field getField() {
+        return mineField;
     }
 }
