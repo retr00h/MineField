@@ -24,6 +24,8 @@ public class GameManager extends Thread {
     @Override
     public void run() {
         super.run();
+
+        // TODO: aspettare che il Main sblocchi la lock
         while (!gameOver) {
             
         }

@@ -17,37 +17,37 @@ public class Controller {
     public static final Image tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY),25,25,true,true);
 
 
-    @FXML
-    private GridPane mineFieldGridPane;
-    private GameManager gameManager;
-    private int fieldWidth;
-    private int fieldHeight;
-    private int bombs;
+//    @FXML
+//    private GridPane mineFieldGridPane;
+//    private GameManager gameManager;
+//    private int fieldWidth;
+//    private int fieldHeight;
+//    private int bombs;
 
     public Controller() {
 
     }
 
     public void initialize() {
-        gameManager = new GameManager(fieldWidth, fieldHeight, bombs);
-        gameManager.setName("Game Manager");
-        gameManager.start();
+//        gameManager = new GameManager(fieldWidth, fieldHeight, bombs);
+//        gameManager.setName("Game Manager");
+//        gameManager.start();
 
-        // TODO: sostituire con lock
-        while(gameManager.getField() == null) {
-
-        }
-
-        RowConstraints rowConstraints = new RowConstraints();
-        rowConstraints.setMinHeight(5);
-
-        ImageView tileImage = new ImageView(tileIcon);
-        for (int i = 0; i < fieldWidth; i++) {
-            for (int j = 0; j < fieldHeight; j++) {
-                mineFieldGridPane.add(tileImage, i, j, 1, 1);
-            }
-//            addRowToFieldGridPane(rowConstraints, i);
-        }
+//        // TODO: sostituire con lock
+//        while(gameManager.getField() == null) {
+//
+//        }
+//
+//        RowConstraints rowConstraints = new RowConstraints();
+//        rowConstraints.setMinHeight(50);
+//
+////        ImageView tileImage = new ImageView(tileIcon);
+//        for (int i = 0; i < fieldWidth; i++) {
+//            for (int j = 0; j < fieldHeight; j++) {
+//                mineFieldGridPane.add(new ImageView(tileIcon), i, j, 1, 1);
+//            }
+////            addRowToFieldGridPane(rowConstraints, i);
+//        }
 
     }
 
@@ -65,15 +65,15 @@ public class Controller {
 //        mineFieldGridPane.getRowConstraints().add(rowConstraints);
 //    }
 
-    public void setFieldWidth(int width) {
-        fieldWidth = width;
-    }
-
-    public void setFieldHeight(int height) {
-        fieldHeight = height;
-    }
-
-    public void setBombs(int bombs) {
-        this.bombs = bombs;
-    }
+//    public void setFieldWidth(int width) {
+//        fieldWidth = width;
+//    }
+//
+//    public void setFieldHeight(int height) {
+//        fieldHeight = height;
+//    }
+//
+//    public void setBombs(int bombs) {
+//        this.bombs = bombs;
+//    }
 }

@@ -4,28 +4,67 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.io.ByteArrayInputStream;
+import java.util.Base64;
+
 public class Main extends Application {
+    private static final String TILE_ICON_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAhASURBVHhe7dqxacNQGEZRKVU6NZnAA2QVz+pVMoAmSOMunSLQAzVp0lmXc+BH3waXB5qnadr2AwAu7G18AYALE3QACBB0AAgQdAAI+POnuOV+GwsAeDXPxzrWyQsdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQACBB0AAgQdAAIEHQAC5v22Y56W+22s63j//BgLAP7n5+t7rGt4PtaxTl7oABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAg6AAQIOgAECDoABAw77cd87Tcb2MBAK/m+VjHOnmhA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0CAoANAgKADQICgA0DAvN92TADgqrzQASBA0AEgQNABIEDQAeDypukXMYIU34GrDc8AAAAASUVORK5CYII=";
+    private static final byte[] TILE_ICON_BYTEARRAY = Base64.getDecoder().decode(TILE_ICON_BASE64);
+    public static final Image tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY),25,25,true,true);
+
     private static final int DEFAULT_WIDTH = 25;
     private static final int DEFAULT_HEIGHT = 25;
     private static final int DEFAULT_BOMBS = 50;
 
+    private GameManager gameManager;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Thread.currentThread().setName("Mine Field");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
-        Parent root = loader.load();
-        Controller controller = loader.getController();
-        controller.setFieldWidth(DEFAULT_WIDTH);
-        controller.setFieldHeight(DEFAULT_HEIGHT);
-        controller.setBombs(DEFAULT_BOMBS);
-
         primaryStage.setTitle("Mine Field");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setMinWidth(500);
-        primaryStage.setMinHeight(500);
+        Thread.currentThread().setName("Mine Field");
+
+        gameManager = new GameManager(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_BOMBS);
+        gameManager.setName("Game Manager");
+        gameManager.start();
+
+        GridPane gridPane = new GridPane();
+
+        for (int i = 0; i < DEFAULT_WIDTH; i++) {
+            for (int j = 0; j < DEFAULT_HEIGHT; j++) {
+                gridPane.add(new ImageView(tileIcon), i, j,1,1);
+            }
+        }
+
+        Scene scene = new Scene(gridPane);
+
+        primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setMinWidth(gridPane.getWidth() + 16);
+        primaryStage.setMinHeight(gridPane.getHeight() + 39);
+        primaryStage.setResizable(false);
+
+        // TODO: sostituire con lock
+        while(gameManager.getField() == null) {
+
+        }
+
+//        FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
+//        Parent root = loader.load();
+//        Controller controller = loader.getController();
+//        controller.setFieldWidth(DEFAULT_WIDTH);
+//        controller.setFieldHeight(DEFAULT_HEIGHT);
+//        controller.setBombs(DEFAULT_BOMBS);
+//
+//        Scene s = new Scene(root);
+//        primaryStage.setScene(s);
+//        primaryStage.setMinWidth(500);
+//        primaryStage.setMinHeight(500);
+//        primaryStage.show();
     }
 
     public static void main(String[] args) {
