@@ -5,8 +5,8 @@ import java.util.Random;
 // contiene il campo minato effettivo, verrà aggiornato ogni volta che l'utente interagisce con la GUI
 public class Field {
     private Cell[][] field;
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     public Field (int width, int height, int bombs) {
         this.width = width;
@@ -56,7 +56,7 @@ public class Field {
         if (i < getWidth() && j < getHeight()) field[i][j] = cell;
     }
 
-    private Cell getCell(int i, int j) {
+    Cell getCell(int i, int j) {
         if (i < getWidth() && j < getHeight()) return field[i][j];
         else return null;
     }
@@ -65,12 +65,12 @@ public class Field {
         String str = "";
         int width = getWidth();
         int height = getHeight();
+
         for (int i = 0; i < width; i++){
             for (int j = 0; j < height; j++) {
                 if (getCell(i, j) instanceof Bomb) str += "B ";
                 else {
-                    Number n = (Number) getCell(i, j);
-                    str += n.getValue() + " ";
+                    str += ((Number) getCell(i, j)).getValue() + " ";
                 }
             }
             str += "\n";

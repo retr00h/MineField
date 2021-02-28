@@ -18,20 +18,29 @@ public class GameManager extends Thread {
         this.height = height;
         this.bombs = bombs;
         flags = bombs;
-        mineField = new Field(width, height, bombs);
     }
 
     @Override
     public void run() {
         super.run();
 
+        mineField = new Field(width, height, bombs);
         // TODO: aspettare che il Main sblocchi la lock
         while (!gameOver) {
             
         }
+        // TODO: qualcosa che indichi il game over
+    }
+
+    void gameOver() {
+        gameOver = true;
     }
 
     public Field getField() {
         return mineField;
+    }
+
+    public void discover(int i, int j) {
+
     }
 }

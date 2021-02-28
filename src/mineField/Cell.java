@@ -1,5 +1,7 @@
 package mineField;
 
-public class Cell {
-
+public abstract class Cell {
+    boolean isBomb() {
+        return this instanceof Bomb;
+    }
 }
