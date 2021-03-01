@@ -18,6 +18,7 @@ public class GameManager extends Thread {
         this.height = height;
         this.bombs = bombs;
         flags = bombs;
+        setDaemon(true);
     }
 
     @Override

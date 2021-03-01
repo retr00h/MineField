@@ -19,7 +19,7 @@ public class Field {
 
         int n = 0;
         Random generator = new Random();
-        while (n < bombs) {
+        while (n <= bombs) {
             int i = generator.nextInt(width);
             int j = generator.nextInt(height);
             if (getCell(i, j) == null) {
