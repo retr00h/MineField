@@ -139,8 +139,18 @@ public class Main extends Application {
         public void handle(MouseEvent event) {
             int x = (int) event.getX();
             int y = (int) event.getY();
-            // TODO: se l'utente dragga per un certo numero di pixel, il clic viene ignorato
-            if (x - clickPressX > tileSide / 2 || y - clickPressY > tileSide / 2) {
+
+            int dragDistanceX;
+            int dragDistanceY;
+            int maxDistance = tileSide / 2;
+
+            if (x > clickPressX) dragDistanceX = x - clickPressX;
+            else dragDistanceX = clickPressX - x;
+
+            if (y > clickPressY) dragDistanceY = y - clickPressX;
+            else dragDistanceY = clickPressY - y;
+
+            if (dragDistanceX >= maxDistance || dragDistanceY >= maxDistance) {
                 clickPressX = -1;
                 clickPressY = -1;
             } else {
