@@ -3,6 +3,7 @@ package mineField;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -138,11 +139,13 @@ public class Main extends Application {
             } else {
                 int i = x / tileSide;
                 int j = y / tileSide;
-                Cell cell = gameManager.getField().getCell(i, j);
-                if (gameManager.canFlag() && event.getButton().equals(MouseButton.SECONDARY)) {
+//                boolean bomb = gameManager.isBomb(i, j);
+                MouseButton mouseButton = event.getButton();
+
+                if (mouseButton.equals(MouseButton.SECONDARY) && gameManager.canFlag()) {
                     update(i, j, 9);
-                } else {
-                    update(i, j, cell.isBomb() ? -1 : ((Number) cell).getValue());
+                } else if (mouseButton.equals(MouseButton.PRIMARY) && !gameManager.isFlag(i, j) && !gameManager.isDiscovered(i, j)) {
+                    update(i, j, gameManager.discover(i, j));
                 }
             }
         }
