@@ -5,6 +5,7 @@ import java.io.File;
 // una specie di controller: agisce su Field ma è controllato dal Controller della GUI
 public class GameManager extends Thread {
     private Field mineField;
+    private boolean[][] flagField;
 
     private final int width;
     private final int height;
@@ -18,7 +19,12 @@ public class GameManager extends Thread {
         this.height = height;
         this.bombs = bombs;
         flags = bombs;
+        initializeFlagField();
         setDaemon(true);
+    }
+
+    private void initializeFlagField() {
+        flagField = new boolean[width][height];
     }
 
     @Override
@@ -41,7 +47,15 @@ public class GameManager extends Thread {
         return mineField;
     }
 
-    public void discover(int i, int j) {
+    public boolean isFlag(int i, int j) {
+        return flagField[i][j];
+    }
 
+    public boolean canFlag() {
+        return flags > 0;
+    }
+
+    public void updateFlag(int i, int j) {
+        flagField[i][j] = !flagField[i][j];
     }
 }
