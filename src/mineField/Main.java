@@ -142,8 +142,12 @@ public class Main extends Application {
 //                boolean bomb = gameManager.isBomb(i, j);
                 MouseButton mouseButton = event.getButton();
 
-                if (mouseButton.equals(MouseButton.SECONDARY) && gameManager.canFlag()) {
-                    update(i, j, 9);
+                if (mouseButton.equals(MouseButton.SECONDARY)) {
+                    if (gameManager.isFlag(i, j)) {
+                        update(i, j, -2);
+                    } else if (gameManager.canFlag()) {
+                        update(i, j, 9);
+                    }
                 } else if (mouseButton.equals(MouseButton.PRIMARY) && !gameManager.isFlag(i, j) && !gameManager.isDiscovered(i, j)) {
                     update(i, j, gameManager.discover(i, j));
                 }
@@ -158,14 +162,13 @@ public class Main extends Application {
 
             image = new ImageView(bombIcon);
             gameManager.gameOver();
+        } else if (value == -2) {
+            // was a flag, goes back to empty tile
+            image = new ImageView(tileIcon);
+            gameManager.updateFlag(i, j);
         } else if (value == 9) {
             // flag
-
-            if (gameManager.isFlag(i, j)) {
-                image = new ImageView(tileIcon);
-            } else {
-                image = new ImageView(flagIcon);
-            }
+            image = new ImageView(flagIcon);
             gameManager.updateFlag(i, j);
         } else {
             image = pickNumber(value);
