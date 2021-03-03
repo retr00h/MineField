@@ -75,6 +75,11 @@ public class Main extends Application {
         tile1Icon = new Image(new ByteArrayInputStream(TILE_1_ICON_BYTEARRAY), tileSide, tileSide,true,true);
         tile2Icon = new Image(new ByteArrayInputStream(TILE_2_ICON_BYTEARRAY), tileSide, tileSide,true,true);
         tile3Icon = new Image(new ByteArrayInputStream(TILE_3_ICON_BYTEARRAY), tileSide, tileSide,true,true);
+        tile4Icon = new Image(new ByteArrayInputStream(TILE_4_ICON_BYTEARRAY), tileSide, tileSide,true,true);
+        tile5Icon = new Image(new ByteArrayInputStream(TILE_5_ICON_BYTEARRAY), tileSide, tileSide,true,true);
+        tile6Icon = new Image(new ByteArrayInputStream(TILE_6_ICON_BYTEARRAY), tileSide, tileSide,true,true);
+        tile7Icon = new Image(new ByteArrayInputStream(TILE_7_ICON_BYTEARRAY), tileSide, tileSide,true,true);
+        tile8Icon = new Image(new ByteArrayInputStream(TILE_8_ICON_BYTEARRAY), tileSide, tileSide,true,true);
 
         primaryStage.setTitle("Mine Field");
         Thread.currentThread().setName("Mine Field");
@@ -147,7 +152,7 @@ public class Main extends Application {
 
             int dragDistanceX;
             int dragDistanceY;
-            int maxDistance = tileSide / 2;
+            int maxDistance = tileSide;
 
             if (x > clickPressX) dragDistanceX = x - clickPressX;
             else dragDistanceX = clickPressX - x;
