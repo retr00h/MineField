@@ -44,12 +44,4 @@ public class GameManager extends Thread {
     public void discover(int i, int j) {
 
     }
-
-    public int getFlags() {
-        return flags;
-    }
-
-    public void setFlags(int flags) {
-        this.flags = flags;
-    }
 }
