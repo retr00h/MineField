@@ -3,7 +3,6 @@ package mineField;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -141,14 +140,15 @@ public class Main extends Application {
                 int j = y / tileSide;
 //                boolean bomb = gameManager.isBomb(i, j);
 
-                if (!gameManager.isFlag(i, j) && !gameManager.isDiscovered(i, j)) {
-                    MouseButton mouseButton = event.getButton();
+                MouseButton mouseButton = event.getButton();
+
+                if (gameManager.isFlag(i, j)) {
                     if (mouseButton.equals(MouseButton.SECONDARY)) {
-                        if (gameManager.isFlag(i, j)) {
-                            update(i, j, -2);
-                        } else if (gameManager.canFlag()) {
-                            update(i, j, 9);
-                        }
+                        update(i, j, -2);
+                    }
+                } else if (!gameManager.isDiscovered(i, j)) {
+                    if (mouseButton.equals(MouseButton.SECONDARY) && gameManager.canFlag()) {
+                        update(i, j, 9);
                     } else if (mouseButton.equals(MouseButton.PRIMARY)) {
                         update(i, j, gameManager.discover(i, j));
                     }
@@ -163,7 +163,8 @@ public class Main extends Application {
             // bomb
 
             image = new ImageView(bombIcon);
-            gameManager.gameOver();
+//            gameManager.gameOver();
+            // TODO: mostrare tutto il campo e inizializzarne uno nuovo
         } else if (value == -2) {
             // was a flag, goes back to empty tile
             image = new ImageView(tileIcon);
@@ -178,7 +179,6 @@ public class Main extends Application {
         gridPane.add(image, i, j, 1, 1);
     }
 
-    // TODO: finire (deve ritornare le icone adeguate)
     private ImageView pickNumber(int value) {
         switch (value) {
             case 0:

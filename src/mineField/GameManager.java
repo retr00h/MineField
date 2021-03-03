@@ -1,11 +1,9 @@
 package mineField;
 
-import java.io.File;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
-// una specie di controller: agisce su Field ma è controllato dal Controller della GUI
 public class GameManager extends Thread {
-    //    private Field mineField;
     private byte[][] mineField;
     private boolean[][] flagField;
     private boolean[][] discoveredField;
@@ -15,15 +13,11 @@ public class GameManager extends Thread {
     private final int bombs;
     private int flags;
 
-    private boolean gameOver = false;
-
     public GameManager(int width, int height, int bombs) {
         this.width = width;
         this.height = height;
         this.bombs = bombs;
         flags = bombs;
-
-        setDaemon(true);
     }
 
     private void initializeMineField() {
@@ -85,21 +79,18 @@ public class GameManager extends Thread {
         initializeFlagField();
         initializeDiscoveredField();
 
-//        mineField = new Field(width, height, bombs);
-        // TODO: aspettare che il Main sblocchi la lock
-        while (!gameOver) {
-
-        }
-        // TODO: qualcosa che indichi il game over
+//        try {
+//            sem.acquire();
+//        } catch (InterruptedException ignored) { }
     }
 
     private void initializeDiscoveredField() {
         discoveredField = new boolean[width][height];
     }
 
-    void gameOver() {
-        gameOver = true;
-    }
+//    void gameOver() {
+//        wake();
+//    }
 
     public byte[][] getField() {
         return mineField;
@@ -122,8 +113,13 @@ public class GameManager extends Thread {
     }
 
     public void updateFlag(int i, int j) {
-        flags--;
-        flagField[i][j] = !flagField[i][j];
+        if (!flagField[i][j]) {
+            flags--;
+            flagField[i][j] = true;
+        } else {
+            flags++;
+            flagField[i][j] = false;
+        }
     }
 
     public boolean canFlag() {
@@ -138,4 +134,8 @@ public class GameManager extends Thread {
     boolean isDiscovered(int i, int j) {
         return discoveredField[i][j];
     }
+
+//    private void wake() {
+//        sem.release();
+//    }
 }
