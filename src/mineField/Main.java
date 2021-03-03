@@ -140,16 +140,18 @@ public class Main extends Application {
                 int i = x / tileSide;
                 int j = y / tileSide;
 //                boolean bomb = gameManager.isBomb(i, j);
-                MouseButton mouseButton = event.getButton();
 
-                if (mouseButton.equals(MouseButton.SECONDARY)) {
-                    if (gameManager.isFlag(i, j)) {
-                        update(i, j, -2);
-                    } else if (gameManager.canFlag()) {
-                        update(i, j, 9);
+                if (!gameManager.isFlag(i, j) && !gameManager.isDiscovered(i, j)) {
+                    MouseButton mouseButton = event.getButton();
+                    if (mouseButton.equals(MouseButton.SECONDARY)) {
+                        if (gameManager.isFlag(i, j)) {
+                            update(i, j, -2);
+                        } else if (gameManager.canFlag()) {
+                            update(i, j, 9);
+                        }
+                    } else if (mouseButton.equals(MouseButton.PRIMARY)) {
+                        update(i, j, gameManager.discover(i, j));
                     }
-                } else if (mouseButton.equals(MouseButton.PRIMARY) && !gameManager.isFlag(i, j) && !gameManager.isDiscovered(i, j)) {
-                    update(i, j, gameManager.discover(i, j));
                 }
             }
         }
