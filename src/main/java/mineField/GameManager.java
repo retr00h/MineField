@@ -96,11 +96,11 @@ public class GameManager extends Thread {
         return mineField;
     }
 
-    private int getWidth() {
+    int getWidth() {
         return width;
     }
 
-    private int getHeight() {
+    int getHeight() {
         return height;
     }
 
