@@ -4,16 +4,20 @@ import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 public class GameManager extends Thread {
+    // TODO: implementare un check su bandiere-bombe per stabilire la vittoria
+
     private byte[][] mineField;
     private boolean[][] flagField;
     private boolean[][] discoveredField;
 
+    private final Main main;
     private final int width;
     private final int height;
     private final int bombs;
     private int flags;
 
-    public GameManager(int width, int height, int bombs) {
+    public GameManager(Main main, int width, int height, int bombs) {
+        this.main = main;
         this.width = width;
         this.height = height;
         this.bombs = bombs;
@@ -74,27 +78,15 @@ public class GameManager extends Thread {
     @Override
     public void run() {
         super.run();
-
         initializeMineField();
         initializeFlagField();
         initializeDiscoveredField();
-
-//        try {
-//            sem.acquire();
-//        } catch (InterruptedException ignored) { }
     }
 
     private void initializeDiscoveredField() {
         discoveredField = new boolean[width][height];
     }
 
-//    void gameOver() {
-//        wake();
-//    }
-
-    public byte[][] getField() {
-        return mineField;
-    }
 
     int getWidth() {
         return width;
@@ -120,6 +112,7 @@ public class GameManager extends Thread {
             flags++;
             flagField[i][j] = false;
         }
+        main.updateFlags(flags);
     }
 
     public boolean canFlag() {

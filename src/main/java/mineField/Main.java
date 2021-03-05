@@ -1,13 +1,17 @@
 package mineField;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -57,25 +61,28 @@ public class Main extends Application {
     private static Image tile7Icon;
     private static Image tile8Icon;
 
-    private static final int tileSide = 50;
-
+    private static final int TILE_SIDE = 50;
     private static final int DEFAULT_WIDTH = 10;
     private static final int DEFAULT_HEIGHT = 10;
     private static final int DEFAULT_BOMBS = 10;
 
+    private boolean canShowAll;
+    private boolean firstClick;
+    private boolean gameOver;
     private Stage primaryStage;
     private GameManager gameManager;
     private GridPane externalGridPane;
     private GridPane topGridPane;
     private GridPane mineField;
+    private Label timerLabel;
+    private Label flagsLabel;
     private int clickPressX;
     private int clickPressY;
-    private boolean canShowAll = true;
+    private Timer timer;
 
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-
         initialize(true);
     }
 
@@ -84,30 +91,38 @@ public class Main extends Application {
             primaryStage.setTitle("Mine Field");
             Thread.currentThread().setName("Mine Field");
 
-            newgameIcon = new Image(new ByteArrayInputStream(NEWGAME_ICON_BYTEARRAY), tileSide, tileSide, true, true);
-            tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            emptyTileIcon = new Image(new ByteArrayInputStream(EMPTY_TILE_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            bombIcon = new Image(new ByteArrayInputStream(BOMB_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            flagIcon = new Image(new ByteArrayInputStream(FLAG_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile1Icon = new Image(new ByteArrayInputStream(TILE_1_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile2Icon = new Image(new ByteArrayInputStream(TILE_2_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile3Icon = new Image(new ByteArrayInputStream(TILE_3_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile4Icon = new Image(new ByteArrayInputStream(TILE_4_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile5Icon = new Image(new ByteArrayInputStream(TILE_5_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile6Icon = new Image(new ByteArrayInputStream(TILE_6_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile7Icon = new Image(new ByteArrayInputStream(TILE_7_ICON_BYTEARRAY), tileSide, tileSide,true,true);
-            tile8Icon = new Image(new ByteArrayInputStream(TILE_8_ICON_BYTEARRAY), tileSide, tileSide,true,true);
+            newgameIcon = new Image(new ByteArrayInputStream(NEWGAME_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE, true, true);
+            tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            emptyTileIcon = new Image(new ByteArrayInputStream(EMPTY_TILE_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            bombIcon = new Image(new ByteArrayInputStream(BOMB_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            flagIcon = new Image(new ByteArrayInputStream(FLAG_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile1Icon = new Image(new ByteArrayInputStream(TILE_1_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile2Icon = new Image(new ByteArrayInputStream(TILE_2_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile3Icon = new Image(new ByteArrayInputStream(TILE_3_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile4Icon = new Image(new ByteArrayInputStream(TILE_4_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile5Icon = new Image(new ByteArrayInputStream(TILE_5_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile6Icon = new Image(new ByteArrayInputStream(TILE_6_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile7Icon = new Image(new ByteArrayInputStream(TILE_7_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            tile8Icon = new Image(new ByteArrayInputStream(TILE_8_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
         }
 
+        if (timer != null) {
+            timer.interrupt();
+        }
         canShowAll = true;
+        firstClick = true;
+        gameOver = false;
 
-        gameManager = new GameManager(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_BOMBS);
+        gameManager = new GameManager(this, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_BOMBS);
         gameManager.setName("Game Manager");
         gameManager.start();
 
-        topGridPane = new GridPane();
         ImageView newGameImageView = new ImageView(newgameIcon);
         newGameImageView.setPreserveRatio(true);
+        flagsLabel = new Label(String.valueOf(DEFAULT_BOMBS));
+        timerLabel = new Label(String.valueOf(0));
+
+        topGridPane = new GridPane();
 
         /* TODO: aggiungere a tutti i tile, con funzionalità di "annullare il clic", ed ottimizzare
             eventualmente sostituendo la classe ClickHandler */
@@ -122,8 +137,13 @@ public class Main extends Application {
             initialize(false);
         });
 
-        topGridPane.add(newGameImageView, 0, 0);
-
+        topGridPane.addRow(0, flagsLabel, newGameImageView, timerLabel);
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(100);
+        for (int i = 0; i < 3; i++) {
+            topGridPane.getColumnConstraints().add(i, columnConstraints);
+            GridPane.setHalignment(topGridPane.getChildren().get(i), HPos.CENTER);
+        }
 
         externalGridPane = new GridPane();
         externalGridPane.add(topGridPane, 0, 0);
@@ -139,6 +159,8 @@ public class Main extends Application {
         }
 
         externalGridPane.add(mineField,0,1);
+        topGridPane.setMinWidth(externalGridPane.getWidth());
+        topGridPane.minHeight(externalGridPane.getHeight());
 
         Scene scene = new Scene(externalGridPane);
 
@@ -161,6 +183,10 @@ public class Main extends Application {
         launch(args);
     }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
     private class ClickHandler implements EventHandler<MouseEvent> {
 
         @Override
@@ -170,7 +196,7 @@ public class Main extends Application {
 
             int dragDistanceX;
             int dragDistanceY;
-            int maxDistance = tileSide;
+            int maxDistance = TILE_SIDE;
 
             if (x > clickPressX) dragDistanceX = x - clickPressX;
             else dragDistanceX = clickPressX - x;
@@ -182,8 +208,8 @@ public class Main extends Application {
                 clickPressX = -1;
                 clickPressY = -1;
             } else {
-                int i = x / tileSide;
-                int j = y / tileSide;
+                int i = x / TILE_SIDE;
+                int j = y / TILE_SIDE;
 //                boolean bomb = gameManager.isBomb(i, j);
 
                 MouseButton mouseButton = event.getButton();
@@ -204,10 +230,16 @@ public class Main extends Application {
     }
 
     private void updateCell(int i, int j, int value) {
+        if (firstClick) {
+            firstClick = false;
+            startTimer();
+        }
+
         ImageView image;
         if (value == -1) {
             // bomb
 
+            gameOver = true;
             image = new ImageView(bombIcon);
             mineField.setOnMouseReleased(event -> {});
             if (canShowAll) {
@@ -226,19 +258,20 @@ public class Main extends Application {
         }
 
         mineField.add(image, i, j, 1, 1);
+    }
 
-        // TODO: finire
-//        if (canShowAll) {
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            initialize();
-//        }
+    private void startTimer() {
+        timer = new Timer(this);
+    }
+
+    public void updateTimerLabel() {
+        String text = timerLabel.getText();
+        final int n = Integer.parseInt(text) + 1;
+        Platform.runLater(() -> timerLabel.setText(String.valueOf(n)));
     }
 
     private void showAll() {
+        canShowAll = false;
         int width = gameManager.getWidth();
         int height = gameManager.getHeight();
         for (int i = 0; i < width; i++) {
@@ -246,6 +279,10 @@ public class Main extends Application {
                 if (!gameManager.isDiscovered(i, j)) updateCell(i, j, gameManager.discover(i, j));
             }
         }
+    }
+
+    public void updateFlags(int flags) {
+        flagsLabel.setText(String.valueOf(flags));
     }
 
     private ImageView pickNumber(int value) {
