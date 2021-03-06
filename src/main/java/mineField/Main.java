@@ -11,8 +11,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
@@ -119,10 +121,22 @@ public class Main extends Application {
 
         ImageView newGameImageView = new ImageView(newgameIcon);
         newGameImageView.setPreserveRatio(true);
+
+        final String fontName = Font.getDefault().getName();
+        final int size = 20;
+        Font f = new Font(fontName, size);
+        Paint textFill = Paint.valueOf("#BBBBBB");
+
         flagsLabel = new Label(String.valueOf(DEFAULT_BOMBS));
+        flagsLabel.setFont(f);
+        flagsLabel.setTextFill(textFill);
+
         timerLabel = new Label(String.valueOf(0));
+        timerLabel.setFont(f);
+        timerLabel.setTextFill(textFill);
 
         topGridPane = new GridPane();
+        topGridPane.setBackground(new Background(new BackgroundFill(Color.rgb(51,51,51,1), null, null)));
 
         /* TODO: aggiungere a tutti i tile, con funzionalità di "annullare il clic", ed ottimizzare
             eventualmente sostituendo la classe ClickHandler */
@@ -222,7 +236,24 @@ public class Main extends Application {
                     if (mouseButton.equals(MouseButton.SECONDARY) && gameManager.canFlag()) {
                         updateCell(i, j, 9);
                     } else if (mouseButton.equals(MouseButton.PRIMARY)) {
-                        updateCell(i, j, gameManager.discover(i, j));
+                        // TODO: se è 0, scoprire le celle adiacenti (ricorsivamente)
+                        discover(i, j);
+                    }
+                }
+            }
+        }
+    }
+
+    private void discover(int i, int j) {
+        byte val = gameManager.discover(i, j);
+        updateCell(i, j, val);
+        if (val == 0) {
+            int width = gameManager.getWidth();
+            int height = gameManager.getHeight();
+            for (int k = i - 1; k <= i + 1; k++) {
+                for (int l = j - 1; l < j + 1; l++) {
+                    if (k >= 0 && l >= 0 && k < width && l < height && !gameManager.isDiscovered(k, l)) {
+                        discover(k, l);
                     }
                 }
             }

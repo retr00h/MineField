@@ -35,7 +35,7 @@ compileJava {
     targetCompatibility = '9'
 }
 
-version 'vALPHA-0.5'
+version '0.5.1-alpha'
 sourceCompatibility = 1.9
 
 repositories {
