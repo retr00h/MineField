@@ -2,7 +2,6 @@ package mineField;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 public class GameManager extends Thread {
     // TODO: implementare un check su bandiere-bombe per stabilire la vittoria
@@ -17,6 +16,7 @@ public class GameManager extends Thread {
     private final int height;
     private final int bombs;
     private int flags;
+    private int discovered;
 
     @Override
     public void run() {
@@ -33,6 +33,7 @@ public class GameManager extends Thread {
         this.height = height;
         this.bombs = bombs;
         flags = bombs;
+        discovered = 0;
     }
 
     private void initializeMineField() {
@@ -40,13 +41,13 @@ public class GameManager extends Thread {
 
         int n = 0;
         Random generator = new Random();
-        while (n <= bombs) {
+        while (n < bombs) {
             int i = generator.nextInt(width);
             int j = generator.nextInt(height);
             if (getCell(i, j) != -1) {
                 setCell((byte) -1, i, j);
+                n++;
             }
-            n++;
         }
 
         for (int i = 0; i < width; i++){
@@ -141,6 +142,7 @@ public class GameManager extends Thread {
 
     public byte discover(int i, int j) {
         discoveredField[i][j] = true;
+        discovered++;
         return getCell(i, j);
     }
 
@@ -150,5 +152,19 @@ public class GameManager extends Thread {
 
     public ArrayList<Coordinate> getAdjacent(int i, int j) {
         return adjacent[i][j];
+    }
+
+    public boolean computeVictory() {
+        if (discovered / (width * height) < (90/100)) return false;
+        int n = 0;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (flagField[i][j] && isBomb(i, j)) {
+                    n++;
+                }
+            }
+        }
+
+        return n == bombs;
     }
 }
