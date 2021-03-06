@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 
 public class Main extends Application {
@@ -248,13 +249,12 @@ public class Main extends Application {
         byte val = gameManager.discover(i, j);
         updateCell(i, j, val);
         if (val == 0) {
-            int width = gameManager.getWidth();
-            int height = gameManager.getHeight();
-            for (int k = i - 1; k <= i + 1; k++) {
-                for (int l = j - 1; l < j + 1; l++) {
-                    if (k >= 0 && l >= 0 && k < width && l < height && !gameManager.isDiscovered(k, l)) {
-                        discover(k, l);
-                    }
+            ArrayList<Coordinate> adjacent = gameManager.getAdjacent(i,j);
+            if (adjacent != null) {
+                for (Coordinate coordinate : adjacent) {
+                    int x = coordinate.getX();
+                    int y = coordinate.getY();
+                    if (!gameManager.isDiscovered(x, y)) discover(x, y);
                 }
             }
         }

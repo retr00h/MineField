@@ -1,5 +1,6 @@
 package mineField;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
@@ -7,6 +8,7 @@ public class GameManager extends Thread {
     // TODO: implementare un check su bandiere-bombe per stabilire la vittoria
 
     private byte[][] mineField;
+    private ArrayList<Coordinate>[][] adjacent;
     private boolean[][] flagField;
     private boolean[][] discoveredField;
 
@@ -15,6 +17,15 @@ public class GameManager extends Thread {
     private final int height;
     private final int bombs;
     private int flags;
+
+    @Override
+    public void run() {
+        super.run();
+        initializeMineField();
+        initializeAdjacent();
+        initializeFlagField();
+        initializeDiscoveredField();
+    }
 
     public GameManager(Main main, int width, int height, int bombs) {
         this.main = main;
@@ -48,6 +59,24 @@ public class GameManager extends Thread {
         }
     }
 
+    private void initializeAdjacent() {
+        adjacent = new ArrayList[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (getCell(i, j) == 0) {
+                    adjacent[i][j] = new ArrayList<Coordinate>();
+                    for (int k = i - 1; k <= i + 1; k++) {
+                        for (int l = j - 1; l <= j + 1; l++) {
+                            if (k >= 0 && l >= 0 && k < width && l < height) {
+                                adjacent[i][j].add(new Coordinate((byte) k, (byte) l));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private byte computeNumber(int i, int j) {
         int width = getWidth();
         int height = getHeight();
@@ -75,18 +104,9 @@ public class GameManager extends Thread {
         flagField = new boolean[width][height];
     }
 
-    @Override
-    public void run() {
-        super.run();
-        initializeMineField();
-        initializeFlagField();
-        initializeDiscoveredField();
-    }
-
     private void initializeDiscoveredField() {
         discoveredField = new boolean[width][height];
     }
-
 
     int getWidth() {
         return width;
@@ -128,7 +148,7 @@ public class GameManager extends Thread {
         return discoveredField[i][j];
     }
 
-//    private void wake() {
-//        sem.release();
-//    }
+    public ArrayList<Coordinate> getAdjacent(int i, int j) {
+        return adjacent[i][j];
+    }
 }
