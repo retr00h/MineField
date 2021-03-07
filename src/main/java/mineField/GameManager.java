@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameManager extends Thread {
-    // TODO: implementare un check su bandiere-bombe per stabilire la vittoria
 
     private byte[][] mineField;
     private ArrayList<Coordinate>[][] adjacent;

@@ -2,10 +2,13 @@ package mineField;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,11 +18,14 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
     private static final String NEWGAME_ICON_BASE64 = "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";
@@ -68,16 +74,27 @@ public class Main extends Application {
     private static Image tile8Icon;
 
     private static final int TILE_SIDE = 50;
-    private static final int DEFAULT_WIDTH = 10;
-    private static final int DEFAULT_HEIGHT = 10;
-    private static final int DEFAULT_BOMBS = 10;
+    private static final int HARD_TILE_SIDE = 40;
+
+    private static final int EASY_WIDTH = 10;
+    private static final int EASY_HEIGHT = 8;
+    private static final int EASY_BOMBS = 10;
+    private static final int NORMAL_WIDTH = 18;
+    private static final int NORMAL_HEIGHT = 14;
+    private static final int NORMAL_BOMBS = 40;
+    private static final int HARD_WIDTH = 24;
+    private static final int HARD_HEIGHT = 20;
+    private static final int HARD_BOMBS = 99;
+
+    private static int currentWidth;
+    private static int currentHeight;
+    private static int currentBombs;
 
     private boolean canShowAll;
     private boolean firstClick;
     private boolean gameOver;
     private Stage primaryStage;
     private GameManager gameManager;
-    private GridPane externalGridPane;
     private GridPane topGridPane;
     private GridPane mineField;
     private Label timerLabel;
@@ -85,32 +102,53 @@ public class Main extends Application {
     private int clickPressX;
     private int clickPressY;
     private Timer timer;
+    private Main main;
 
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        initialize(true);
+        initialize(NORMAL_WIDTH, NORMAL_HEIGHT, NORMAL_BOMBS, true);
     }
 
-    public void initialize (boolean first) {
+    public void initialize (int width, int height, int bombs, boolean first) {
         if (first) {
             primaryStage.setTitle("Mine Field");
             Thread.currentThread().setName("Mine Field");
 
-            newgameIcon = new Image(new ByteArrayInputStream(NEWGAME_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE, true, true);
-            victoryIcon = new Image(new ByteArrayInputStream(VICTORY_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE, true, true);
-            tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            emptyTileIcon = new Image(new ByteArrayInputStream(EMPTY_TILE_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            bombIcon = new Image(new ByteArrayInputStream(BOMB_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            flagIcon = new Image(new ByteArrayInputStream(FLAG_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile1Icon = new Image(new ByteArrayInputStream(TILE_1_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile2Icon = new Image(new ByteArrayInputStream(TILE_2_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile3Icon = new Image(new ByteArrayInputStream(TILE_3_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile4Icon = new Image(new ByteArrayInputStream(TILE_4_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile5Icon = new Image(new ByteArrayInputStream(TILE_5_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile6Icon = new Image(new ByteArrayInputStream(TILE_6_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile7Icon = new Image(new ByteArrayInputStream(TILE_7_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
-            tile8Icon = new Image(new ByteArrayInputStream(TILE_8_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            main = this;
+
+            if (width >= HARD_WIDTH || height >= HARD_HEIGHT) {
+                newgameIcon = new Image(new ByteArrayInputStream(NEWGAME_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE, true, true);
+                victoryIcon = new Image(new ByteArrayInputStream(VICTORY_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE, true, true);
+                tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                emptyTileIcon = new Image(new ByteArrayInputStream(EMPTY_TILE_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                bombIcon = new Image(new ByteArrayInputStream(BOMB_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                flagIcon = new Image(new ByteArrayInputStream(FLAG_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile1Icon = new Image(new ByteArrayInputStream(TILE_1_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile2Icon = new Image(new ByteArrayInputStream(TILE_2_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile3Icon = new Image(new ByteArrayInputStream(TILE_3_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile4Icon = new Image(new ByteArrayInputStream(TILE_4_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile5Icon = new Image(new ByteArrayInputStream(TILE_5_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile6Icon = new Image(new ByteArrayInputStream(TILE_6_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile7Icon = new Image(new ByteArrayInputStream(TILE_7_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+                tile8Icon = new Image(new ByteArrayInputStream(TILE_8_ICON_BYTEARRAY), HARD_TILE_SIDE, HARD_TILE_SIDE,true,true);
+            } else {
+                newgameIcon = new Image(new ByteArrayInputStream(NEWGAME_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE, true, true);
+                victoryIcon = new Image(new ByteArrayInputStream(VICTORY_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE, true, true);
+                tileIcon = new Image(new ByteArrayInputStream(TILE_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                emptyTileIcon = new Image(new ByteArrayInputStream(EMPTY_TILE_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                bombIcon = new Image(new ByteArrayInputStream(BOMB_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                flagIcon = new Image(new ByteArrayInputStream(FLAG_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile1Icon = new Image(new ByteArrayInputStream(TILE_1_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile2Icon = new Image(new ByteArrayInputStream(TILE_2_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile3Icon = new Image(new ByteArrayInputStream(TILE_3_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile4Icon = new Image(new ByteArrayInputStream(TILE_4_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile5Icon = new Image(new ByteArrayInputStream(TILE_5_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile6Icon = new Image(new ByteArrayInputStream(TILE_6_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile7Icon = new Image(new ByteArrayInputStream(TILE_7_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+                tile8Icon = new Image(new ByteArrayInputStream(TILE_8_ICON_BYTEARRAY), TILE_SIDE, TILE_SIDE,true,true);
+            }
+
         }
 
         if (timer != null) {
@@ -120,7 +158,11 @@ public class Main extends Application {
         firstClick = true;
         gameOver = false;
 
-        gameManager = new GameManager(this, DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_BOMBS);
+        currentWidth = width;
+        currentHeight = height;
+        currentBombs = bombs;
+
+        gameManager = new GameManager(this, currentWidth, currentHeight, currentBombs);
         gameManager.setName("Game Manager");
         gameManager.start();
 
@@ -132,7 +174,7 @@ public class Main extends Application {
         Font f = new Font(fontName, size);
         Paint textFill = Paint.valueOf("#BBBBBB");
 
-        flagsLabel = new Label(String.valueOf(DEFAULT_BOMBS));
+        flagsLabel = new Label(String.valueOf(currentBombs));
         flagsLabel.setFont(f);
         flagsLabel.setTextFill(textFill);
 
@@ -153,7 +195,7 @@ public class Main extends Application {
         });
         newGameImageView.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
             newGameImageView.setEffect(null);
-            initialize(false);
+            initialize(currentWidth, currentHeight, currentBombs, false);
         });
 
         topGridPane.addRow(0, flagsLabel, newGameImageView, timerLabel);
@@ -164,13 +206,13 @@ public class Main extends Application {
             GridPane.setHalignment(topGridPane.getChildren().get(i), HPos.CENTER);
         }
 
-        externalGridPane = new GridPane();
+        GridPane externalGridPane = new GridPane();
         externalGridPane.add(topGridPane, 0, 0);
 
         mineField = new GridPane();
 
-        for (int i = 0; i < DEFAULT_WIDTH; i++) {
-            for (int j = 0; j < DEFAULT_HEIGHT; j++) {
+        for (int i = 0; i < currentWidth; i++) {
+            for (int j = 0; j < currentHeight; j++) {
                 ImageView tile = new ImageView(tileIcon);
                 tile.setPreserveRatio(true);
                 mineField.add(tile, i, j,1,1);
@@ -181,13 +223,37 @@ public class Main extends Application {
         topGridPane.setMinWidth(externalGridPane.getWidth());
         topGridPane.minHeight(externalGridPane.getHeight());
 
-        Scene scene = new Scene(externalGridPane);
-
         mineField.setOnMousePressed(event -> {
             this.clickPressX = (int) event.getX();
             this.clickPressY = (int) event.getY();
         });
         mineField.setOnMouseReleased(new ClickHandler());
+
+        MenuHandler menuHandler = new MenuHandler();
+
+        MenuItem easyMode = new MenuItem("Facile");
+        MenuItem normalMode = new MenuItem("Normale");
+        MenuItem hardMode = new MenuItem("Difficile");
+        MenuItem customMode = new MenuItem("Personalizza");
+        easyMode.setId("easy");
+        normalMode.setId("normal");
+        hardMode.setId("hard");
+        customMode.setId("custom");
+        easyMode.setOnAction(menuHandler);
+        normalMode.setOnAction(menuHandler);
+        hardMode.setOnAction(menuHandler);
+        customMode.setOnAction(menuHandler);
+
+        Menu difficultyMenu = new Menu("Difficolta'");
+        difficultyMenu.getItems().addAll(easyMode, normalMode, hardMode, customMode);
+        MenuBar menuBar = new MenuBar(difficultyMenu);
+
+        BorderPane bp = new BorderPane();
+        bp.setTop(menuBar);
+        bp.setCenter(externalGridPane);
+
+
+        Scene scene = new Scene(bp);
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -206,6 +272,18 @@ public class Main extends Application {
         return gameOver;
     }
 
+    public void setCurrentWidth(int width) {
+        currentWidth = width;
+    }
+
+    public void setCurrentHeight(int height) {
+        currentHeight = height;
+    }
+
+    public void setCurrentBombs(int bombs) {
+        currentBombs = bombs;
+    }
+
     private class ClickHandler implements EventHandler<MouseEvent> {
 
         @Override
@@ -215,7 +293,7 @@ public class Main extends Application {
 
             int dragDistanceX;
             int dragDistanceY;
-            int maxDistance = TILE_SIDE;
+            int maxDistance = (currentWidth >= HARD_WIDTH || currentHeight >= HARD_HEIGHT) ? HARD_TILE_SIDE : TILE_SIDE;
 
             if (x > clickPressX) dragDistanceX = x - clickPressX;
             else dragDistanceX = clickPressX - x;
@@ -227,8 +305,8 @@ public class Main extends Application {
                 clickPressX = -1;
                 clickPressY = -1;
             } else {
-                int i = x / TILE_SIDE;
-                int j = y / TILE_SIDE;
+                int i = x / maxDistance;
+                int j = y / maxDistance;
 //                boolean bomb = gameManager.isBomb(i, j);
 
                 MouseButton mouseButton = event.getButton();
@@ -348,5 +426,164 @@ public class Main extends Application {
                 return new ImageView(tile8Icon);
         }
         return null;
+    }
+
+    private class MenuHandler implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent event) {
+            MenuItem menuItem = ((MenuItem) event.getSource());
+            switch (menuItem.getId()) {
+                case "easy":
+                    initialize(EASY_WIDTH, EASY_HEIGHT, EASY_BOMBS, true);
+                    break;
+                case "normal":
+                    initialize(NORMAL_WIDTH, NORMAL_HEIGHT, NORMAL_BOMBS, true);
+                    break;
+                case "hard":
+                    initialize(HARD_WIDTH, HARD_HEIGHT, HARD_BOMBS, true);
+                    break;
+                case "custom":
+                    showDialog();
+                    boolean b = (currentWidth == HARD_WIDTH && currentHeight == HARD_HEIGHT && currentBombs == HARD_BOMBS) ||
+                            (currentWidth == NORMAL_WIDTH && currentHeight == NORMAL_HEIGHT && currentBombs == NORMAL_BOMBS) ||
+                            (currentWidth == EASY_WIDTH && currentHeight == EASY_HEIGHT && currentBombs == EASY_BOMBS);
+                    if (!b) initialize(currentWidth, currentHeight, currentBombs, true);
+                    break;
+            }
+        }
+
+        private void showDialog() {
+            AtomicInteger width = new AtomicInteger();
+            AtomicInteger height = new AtomicInteger();
+            AtomicInteger bombs = new AtomicInteger();
+            AtomicBoolean widthOk = new AtomicBoolean(false);
+            AtomicBoolean heightOk = new AtomicBoolean(false);
+            AtomicBoolean bombsOk = new AtomicBoolean(false);
+
+            GridPane dialogGridPane = new GridPane();
+            dialogGridPane.setMinWidth(300);
+            dialogGridPane.setMinHeight(300);
+            Label widthLabel = new Label("Larghezza campo");
+            Label heigthLabel = new Label("Altezza campo");
+            Label bombsLabel = new Label("Bombe");
+
+            TextField widthTextField = new TextField();
+            TextField heightTextField = new TextField();
+            TextField bombsTextField = new TextField();
+
+            Label errorLabel = new Label();
+            errorLabel.setWrapText(true);
+            errorLabel.setTextFill(Color.RED);
+
+            Button confirmButton = new Button("Conferma");
+            confirmButton.setDisable(true);
+
+            dialogGridPane.add(widthLabel, 0, 0, 1, 1);
+            dialogGridPane.add(heigthLabel, 0, 1, 1, 1);
+            dialogGridPane.add(bombsLabel, 0, 2, 1, 1);
+            dialogGridPane.add(errorLabel, 0, 3, 1, 1);
+            dialogGridPane.add(widthTextField, 1, 0, 1, 1);
+            dialogGridPane.add(heightTextField, 1, 1, 1, 1);
+            dialogGridPane.add(bombsTextField, 1, 2, 1, 1);
+            dialogGridPane.add(confirmButton, 1, 3, 1, 1);
+
+            GridPane.setHalignment(widthLabel, HPos.CENTER);
+            GridPane.setHalignment(heigthLabel, HPos.CENTER);
+            GridPane.setHalignment(bombsLabel, HPos.CENTER);
+            GridPane.setHalignment(confirmButton, HPos.RIGHT);
+
+            Insets insets = new Insets(5,5,5,5);
+            GridPane.setMargin(widthLabel, insets);
+            GridPane.setMargin(heigthLabel, insets);
+            GridPane.setMargin(bombsLabel, insets);
+            GridPane.setMargin(errorLabel, insets);
+            GridPane.setMargin(widthTextField, insets);
+            GridPane.setMargin(heightTextField, insets);
+            GridPane.setMargin(bombsTextField, insets);
+            GridPane.setMargin(confirmButton, insets);
+
+            ColumnConstraints columnConstraints = new ColumnConstraints();
+            columnConstraints.setPercentWidth(50);
+            dialogGridPane.getColumnConstraints().add(0, columnConstraints);
+            dialogGridPane.getColumnConstraints().add(1, columnConstraints);
+
+            confirmButton.setOnMouseClicked(event -> {
+                setCurrentWidth(width.get());
+                setCurrentHeight(height.get());
+                setCurrentBombs(bombs.get());
+
+                Node source = (Node) event.getSource();
+                Stage stage  = (Stage) source.getScene().getWindow();
+                stage.close();
+            });
+
+            widthTextField.setOnKeyReleased(event -> {
+                try {
+                    int w = Integer.parseInt(widthTextField.getText());
+                    if (w > 0 && w <= 45) {
+                        width.set(w);
+                        widthOk.set(true);
+                    } else {
+                        widthOk.set(false);
+                    }
+                } catch (NumberFormatException e) {
+                    widthOk.set(false);
+                } finally {
+                    updateErrorTextAndConfirmButton(errorLabel, confirmButton, widthOk.get(), heightOk.get(), bombsOk.get());
+                }
+            });
+
+            heightTextField.setOnKeyReleased(event -> {
+                try {
+                    int h = Integer.parseInt(heightTextField.getText());
+                    if (h > 0 && h <= 20) {
+                        height.set(h);
+                        heightOk.set(true);
+                    } else {
+                        heightOk.set(false);
+                    }
+                } catch (NumberFormatException e) {
+                    heightOk.set(false);
+                } finally {
+                    updateErrorTextAndConfirmButton(errorLabel, confirmButton, widthOk.get(), heightOk.get(), bombsOk.get());
+                }
+            });
+
+            bombsTextField.setOnKeyReleased(event -> {
+                try {
+                    int b = Integer.parseInt(bombsTextField.getText());
+                    if (b > 0 && b <= (width.get() * height.get())) {
+                        bombs.set(b);
+                        bombsOk.set(true);
+                    } else {
+                        bombsOk.set(false);
+                    }
+                } catch (NumberFormatException e) {
+                    bombsOk.set(false);
+                } finally {
+                    updateErrorTextAndConfirmButton(errorLabel, confirmButton, widthOk.get(), heightOk.get(), bombsOk.get());
+                }
+            });
+
+
+
+            Scene s = new Scene(dialogGridPane);
+            Stage stage = new Stage();
+            stage.setResizable(false);
+            stage.setTitle("Minefield - Personalizza difficolta'");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(s);
+            stage.showAndWait();
+        }
+
+        private void updateErrorTextAndConfirmButton(Label errorLabel, Button confirmButton, boolean widthOk, boolean heightOk, boolean bombsOk) {
+            confirmButton.setDisable(!widthOk || !heightOk || !bombsOk);
+
+            String errorText = "";
+            if (!widthOk) errorText += "La larghezza del campo deve essere maggiore di 0 e minore o uguale di 45.\n";
+            if (!heightOk) errorText += "L'altezza del campo deve essere maggiore di 0 e minore o uguale di 20.\n";
+            if (!bombsOk) errorText += "Il numero di bombe deve essere maggiore di 0 e minore o uguale all'area del campo.";
+            errorLabel.setText(errorText);
+        }
     }
 }
