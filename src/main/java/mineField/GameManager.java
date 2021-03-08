@@ -1,16 +1,14 @@
 package mineField;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class GameManager extends Thread {
 
     private byte[][] mineField;
-    private ArrayList<Coordinate>[][] adjacent;
+    private Coordinate[][][] adjacent;
     private boolean[][] flagField;
     private boolean[][] discoveredField;
 
-    private final Main main;
     private final int width;
     private final int height;
     private final int bombs;
@@ -26,8 +24,7 @@ public class GameManager extends Thread {
         initializeDiscoveredField();
     }
 
-    public GameManager(Main main, int width, int height, int bombs) {
-        this.main = main;
+    public GameManager(int width, int height, int bombs) {
         this.width = width;
         this.height = height;
         this.bombs = bombs;
@@ -59,22 +56,30 @@ public class GameManager extends Thread {
         }
     }
 
+    // matrice tridimensionale usata per trovare le celle adiacenti ad una data cella.
+    // lo scopo è quello di accedere all'array nella cella (i, j) quando una cella viene cliccata,
+    // in modo da scoprire tutte le celle adiacenti (ricorsivamente) se la cella cliccata è una cella
+    // senza bombe nelle celle adiacenti (vedere Main.discover())
     private void initializeAdjacent() {
-        adjacent = new ArrayList[width][height];
+        adjacent = new Coordinate[width][height][9];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
+                int index = 0;
                 if (getCell(i, j) == 0) {
-                    adjacent[i][j] = new ArrayList<Coordinate>();
                     for (int k = i - 1; k <= i + 1; k++) {
                         for (int l = j - 1; l <= j + 1; l++) {
                             if (k >= 0 && l >= 0 && k < width && l < height) {
-                                adjacent[i][j].add(new Coordinate((byte) k, (byte) l));
+                                if (!(k == i && l == j)) {
+                                    adjacent[i][j][index] = new Coordinate((byte) k, (byte) l);
+                                    index++;
+                                }
                             }
                         }
                     }
                 }
             }
         }
+        System.gc();
     }
 
     private byte computeNumber(int i, int j) {
@@ -132,7 +137,7 @@ public class GameManager extends Thread {
             flags++;
             flagField[i][j] = false;
         }
-        main.updateFlags(flags);
+        Main.updateFlags(flags);
     }
 
     public boolean canFlag() {
@@ -149,7 +154,7 @@ public class GameManager extends Thread {
         return discoveredField[i][j];
     }
 
-    public ArrayList<Coordinate> getAdjacent(int i, int j) {
+    public Coordinate[] getAdjacent(int i, int j) {
         return adjacent[i][j];
     }
 
